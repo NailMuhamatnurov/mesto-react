@@ -32,7 +32,7 @@ function App() {
         setEditAvatarClick(false);
         setEditProfileClick(false);
         setAddCardClick(false);
-        setSelectedCard({...selectedCard, isOpen: false});
+        setSelectedCard({element: {}, isOpen: false});
     }
 
     return (
