@@ -44,7 +44,7 @@ class Api {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                avatar: src.link
+                avatar: src
             })
             })
             .then(res => {
@@ -80,7 +80,7 @@ class Api {
 
     addNewCard({
         name,
-         link
+        link
     }) {
          return fetch(this._cardsUrl, {
              method: 'POST',
@@ -100,6 +100,37 @@ class Api {
                return Promise.reject(`Ошибка: ${res.status}`);
            })
     }
+
+    changeLikeCardStatus(cardId, isLiked){
+        return fetch(`${this._likeUrl}/${cardId}`, {
+            method: isLiked ? "PUT" : "DELETE",
+            headers: {
+                authorization: this._token,
+            }
+        })
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
+    }
+
+    deleteCard(cardId) {
+        return fetch(`${this._cardsUrl}/${cardId}`, {
+            method: 'DELETE',
+            headers: {
+                authorization: this._token,
+            }
+        })
+            .then(res => {
+                if (res.ok) {
+                    return res.json();
+                }
+                return Promise.reject(`Ошибка: ${res.status}`);
+            })
+    }
+
 }
 
 const api = new Api({
