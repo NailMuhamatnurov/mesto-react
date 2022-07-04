@@ -16,7 +16,7 @@ function App() {
     const [isEditProfilePopupOpen, setEditProfileClick] = React.useState(false);
     const [isAddPlacePopupOpen, setAddCardClick] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({element: {}, isOpen: false});
-    const [currentUser, setCurrentUser] = React.useState('');
+    const [currentUser, setCurrentUser] = React.useState({});
     const [cards, setCards] = React.useState([]);
     const [selectedCardDeleteQuestion, setSelectedCardDeleteQuestion] = React.useState({isOpen: false, card: {}});
     const [renderSaving, setRenderSaving] = React.useState(false);
@@ -44,9 +44,13 @@ function App() {
     function handleCardLike(card) {
         const isLiked = card.likes.some(i => i._id === currentUser._id);
 
-        api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+        api.changeLikeCardStatus(card._id, !isLiked)
+            .then((newCard) => {
             setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-        });
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     function handleCardDelete(card) {

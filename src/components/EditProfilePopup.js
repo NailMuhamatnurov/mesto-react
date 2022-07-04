@@ -11,7 +11,7 @@ const currentUser = React.useContext(TranslationContext);
 React.useEffect(() => {
     setName(currentUser.name);
     setDescription(currentUser.about);
-}, [currentUser]); 
+}, [currentUser, props.isOpen]); 
 
 function inputName(e) {
     setName(e.target.value);
