@@ -31,7 +31,7 @@ function handleSubmit(e) {
   } 
 
 return (
-    <PopupWithForm name='profile' title='Редактировать профиль' button='Сохранить' isOpen={props.isOpen} onClose={props.onClose} onSubmit={handleSubmit}>
+    <PopupWithForm name='profile' title='Редактировать профиль' button={props.isRender ? 'Сохранение...' : 'Сохранить'} isOpen={props.isOpen} onClose={props.onClose} onSubmit={handleSubmit}>
         <input type="text" placeholder="Имя" id="name" className="popup__input" minLength="2" maxLength="40" name="name" onChange={inputName} required value={name || ''}/>
         <span id="name-error" className="popup__input-error">вы пропустили это поле</span>
         <input type="text" placeholder="О себе" id="description" className="popup__input" minLength="2" maxLength="200" name="about" onChange={inputDescription} required value={description || ''}/>

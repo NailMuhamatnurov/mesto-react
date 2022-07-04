@@ -1,7 +1,6 @@
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-import PopupWithForm from './PopupWithForm';
 import React from 'react';
 import ImagePopup from './ImagePopup';
 import { TranslationContext } from '../contexts/CurrentUserContext';
@@ -9,6 +8,7 @@ import api from '../utils/api';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import DeleteQuestionForm from './DeleteQuestionForm';
 
 function App() {
   
@@ -18,9 +18,9 @@ function App() {
     const [selectedCard, setSelectedCard] = React.useState({element: {}, isOpen: false});
     const [currentUser, setCurrentUser] = React.useState('');
     const [cards, setCards] = React.useState([]);
+    const [selectedCardDeleteQuestion, setSelectedCardDeleteQuestion] = React.useState({isOpen: false, card: {}});
     const [renderSaving, setRenderSaving] = React.useState(false);
-
-
+    
     React.useEffect(() => {
         api.getUserData()
         .then(data => {
@@ -50,9 +50,18 @@ function App() {
     }
 
     function handleCardDelete(card) {
-        api.deleteCard(card._id).then(() => {
-            setCards((state) => state.filter((c) => c._id === card._id ? false : true));
-        });
+        setRenderSaving(true);
+        api.deleteCard(card._id)
+            .then(() => {
+                setCards((state) => state.filter((c) => c._id === card._id ? false : true))
+                closeAllPopups();
+            })
+            .catch(err => {
+                console.log(err);
+              })    
+            .finally(() => {
+                setRenderSaving(false);
+            });    
     }
 
     function handleEditAvatarClick() {
@@ -71,14 +80,20 @@ function App() {
         setSelectedCard({...selectedCard, isOpen: true, element: card});
     }
 
+    function handleDeleteCardClick(card) {
+        setSelectedCardDeleteQuestion({...selectedCardDeleteQuestion, isOpen: true, card: card});
+    }
+
     function closeAllPopups() {
         setEditAvatarClick(false);
         setEditProfileClick(false);
         setAddCardClick(false);
         setSelectedCard({element: {}, isOpen: false});
+        setSelectedCardDeleteQuestion({...selectedCardDeleteQuestion, isOpen: false});
     }
 
     function handleUpdateUser(userInfo) {
+        setRenderSaving(true);
         api.saveUserInfo(userInfo)
             .then((data) => {
                 setCurrentUser(data);
@@ -87,9 +102,13 @@ function App() {
             .catch(err => {
                 console.log('Ошибка ' + err);
             })
+            .finally(() => {
+                setRenderSaving(false);
+            });
     }
 
     function handleUpdateAvatar(avatarInfo) {
+        setRenderSaving(true);
         api.changeAvatar(avatarInfo)
             .then((data) => {
                 setCurrentUser({...currentUser, avatar: data.avatar}); 
@@ -97,11 +116,14 @@ function App() {
             })
             .catch(err => {
                 console.log('Ошибка ' + err);
-            }) 
+            })
+            .finally(() => {
+                setRenderSaving(false);
+            }); 
     }
 
-
     function handleUpdatePlace(cardInfo) {
+        setRenderSaving(true);
         api.addNewCard(cardInfo)
         .then((data) => {
             setCards([data, ...cards]);
@@ -109,7 +131,10 @@ function App() {
         })
         .catch(err => {
             console.log('Ошибка ' + err);
-        })  
+        })
+        .finally(() => {
+            setRenderSaving(false);
+        });   
     }
 
     return (
@@ -122,19 +147,19 @@ function App() {
                     onAddCard={handleAddCardClick}
                     onCardClick={handleCardClick}
                     onCardLike={handleCardLike}
-                    onCardDelete={handleCardDelete}
                     card={cards}
+                    onCardDelete={handleDeleteCardClick}
                 />
 
                 <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
 
-                <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
+                <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} isRender={renderSaving}/>
                 
-                <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
+                <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} isRender={renderSaving}/>
 
-                <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onUpdatePlace={handleUpdatePlace}/>
+                <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onUpdatePlace={handleUpdatePlace} isRender={renderSaving}/>
 
-                <PopupWithForm name='question' title='Вы уверены?' button='Да' onClose={closeAllPopups}/>
+                <DeleteQuestionForm deleteCard={selectedCardDeleteQuestion} onClose={closeAllPopups} onDeleteCard={handleCardDelete} isRender={renderSaving}/>
 
                 <Footer />
             </div> 
@@ -142,6 +167,5 @@ function App() {
     
     );
 };
-
 
 export default App;
