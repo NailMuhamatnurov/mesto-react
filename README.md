@@ -9,7 +9,7 @@
 
 **Сайт**
 
-https://nailmuhamatnurov.github.io/mesto/
+https://nailmuhamatnurov.github.io/mesto-react/
 
 **Figma**
 
